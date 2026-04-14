@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  GUARDIAN
+  CHILD
+}
+
+model User {
+  id              String      @id @default(cuid())
+  name            String?
+  email           String      @unique
+  password        String
+  role            UserRole    @default(USER)
+  guardianCode    String?     @unique // Generated for guardians to link children
+  linkedGuardianId String?    // For children to reference their guardian
+  image           String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  accounts        Account[]
+  transactions    Transaction[]
+  budgets         Budget[]
+  notifications   Notification[]
+  savingGoals     SavingGoal[]
+}
+
+model Account {
+  id        String   @id @default(cuid())
+  name      String   // e.g., "Main Bank", "Wallet"
+  balance   Float    @default(0)
+  currency  String   @default("USD")
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  transactions Transaction[]
+}
+
+model Category {
+  id    String @id @default(cuid())
+  name  String @unique // Traveling, Transport, Medical, Food, Grocery, Insurance, Loans, EMI, Other
+  icon  String?
+  type  String @default("EXPENSE") // EXPENSE or INCOME
+
+  transactions Transaction[]
+  budgets      Budget[]
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  amount      Float
+  description String
+  date        DateTime @default(now())
+  type        String   @default("EXPENSE") // EXPENSE or INCOME
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  
+  accountId   String
+  account     Account  @relation(fields: [accountId], references: [id])
+  
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+  
+  receiptUrl  String?  // Storage for bill images
+  isAIProcessed Boolean @default(false)
+}
+
+model Budget {
+  id         String   @id @default(cuid())
+  limit      Float
+  spent      Float    @default(0)
+  month      Int
+  year       Int
+  
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([userId, categoryId, month, year])
+}
+
+model SavingGoal {
+  id           String   @id @default(cuid())
+  name         String
+  targetAmount Float
+  currentAmount Float    @default(0)
+  deadline     DateTime?
+  
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  message   String
+  isRead    Boolean  @default(false)
+  type      String   @default("INFO") // INFO, WARNING, SUCCESS
+  createdAt DateTime @default(now())
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+}
