@@ -21,7 +21,7 @@ export default function LandingPage() {
   const { t, lang } = useLanguage();
 
   return (
-    <div className="relative min-h-[calc(100vh-120px)] overflow-hidden flex flex-col items-center justify-center py-12 px-4">
+    <div className="relative min-h-[calc(100vh-40px)] overflow-hidden flex flex-col items-center justify-center py-12 px-4">
       {/* Abstract Background / Decorative Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-primary/20 blur-[120px] rounded-full" />
