@@ -4,15 +4,15 @@ import { Bell, Globe, Search, User, X, CheckCheck } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Language, translations } from "@/lib/translations";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function TopNav() {
+  const { lang, setLang, t } = useLanguage();
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [lang, setLang] = useState<Language>("EN");
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  const t = translations[lang];
   const languages: Language[] = ["EN", "HI", "TE", "ES", "FR"];
 
   const fetchNotifications = async () => {

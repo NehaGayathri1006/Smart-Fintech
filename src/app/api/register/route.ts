@@ -27,7 +27,7 @@ export async function POST(req: Request) {
           create: {
             name: "Main Wallet",
             balance: 0,
-            currency: "USD",
+            currency: "INR",
           }
         }
       },

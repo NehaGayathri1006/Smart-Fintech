@@ -39,7 +39,7 @@ model Account {
   id        String   @id @default(cuid())
   name      String   // e.g., "Main Bank", "Wallet"
   balance   Float    @default(0)
-  currency  String   @default("USD")
+  currency  String   @default("INR")
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   

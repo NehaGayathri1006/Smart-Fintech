@@ -13,7 +13,10 @@ interface Props {
 
 
 
+import { useLanguage } from "@/context/LanguageContext";
+
 export default function AddTransactionModal({ isOpen, onClose }: Props) {
+  const { lang, t } = useLanguage();
   const [step, setStep] = useState(1);
   const [isAIProcessing, setIsAIProcessing] = useState(false);
   const [accounts, setAccounts] = useState<any[]>([]);
@@ -75,7 +78,7 @@ export default function AddTransactionModal({ isOpen, onClose }: Props) {
           setStep(2);
         } catch (error) {
           console.error(error);
-          alert("Failed to extract data. Please enter manually.");
+          alert(lang === "HI" ? "डेटा निकालने में विफल। कृपया मैन्युअल रूप से दर्ज करें।" : "Failed to extract data. Please enter manually.");
         } finally {
           setIsAIProcessing(false);
         }
@@ -115,8 +118,8 @@ export default function AddTransactionModal({ isOpen, onClose }: Props) {
             {/* Header */}
             <div className="p-6 border-b border-white/5 flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-bold text-white">Add Transaction</h2>
-                <p className="text-sm text-slate-400">Manual entry or AI receipt scan</p>
+                <h2 className="text-xl font-bold text-white">{lang === "HI" ? "लेनदेन जोड़ें" : lang === "TE" ? "లావాదేవీని జోడించండి" : "Add Transaction"}</h2>
+                <p className="text-sm text-slate-400">{lang === "HI" ? "मैन्युअल प्रविष्टि या एआई रसीद स्कैन" : lang === "TE" ? "మాన్యువల్ ఎంట్రీ లేదా AI రసీదు స్కాన్" : "Manual entry or AI receipt scan"}</p>
               </div>
               <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-full text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -226,8 +229,8 @@ export default function AddTransactionModal({ isOpen, onClose }: Props) {
                         onChange={(e) => setFormData({...formData, accountId: e.target.value})}
                         className="w-full bg-slate-800 border border-white/5 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-primary"
                       >
-                        {accounts.map((acc: { id: string; name: string; balance: number }) => (
-                           <option key={acc.id} value={acc.id}>{acc.name} (${acc.balance})</option>
+                        {accounts.map((acc: { id: string; name: string; balance: number; currency: string }) => (
+                           <option key={acc.id} value={acc.id}>{acc.name} ({acc.currency === 'INR' ? '₹' : (acc.currency || '₹')} {acc.balance.toLocaleString()})</option>
                         ))}
                       </select>
                     </div>

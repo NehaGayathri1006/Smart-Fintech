@@ -15,14 +15,17 @@ import {
   Pie
 } from "recharts";
 
+import { useLanguage } from "@/context/LanguageContext";
+
 interface ChartProps {
   areaData: any[];
   pieData: any[];
 }
 
 export default function DashboardCharts({ areaData, pieData }: ChartProps) {
+  const { lang, t } = useLanguage();
   const defaultPieData = [
-    { name: "Not enough data", value: 100, color: "#334155" },
+    { name: lang === "HI" ? "पर्याप्त डेटा नहीं" : lang === "TE" ? "తగినంత డేటా లేదు" : "Not enough data", value: 100, color: "#334155" },
   ];
 
   const activePieData = pieData && pieData.length > 0 ? pieData : defaultPieData;
@@ -40,7 +43,9 @@ export default function DashboardCharts({ areaData, pieData }: ChartProps) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
       {/* Spending Trends */}
       <div className="lg:col-span-2 p-6 rounded-3xl border border-white/5 glass-dark min-h-[400px]">
-        <h3 className="text-lg font-bold mb-6 text-white">Expense vs Income Trends</h3>
+        <h3 className="text-lg font-bold mb-6 text-white">
+          {lang === "HI" ? "व्यय बनाम आय रुझान" : lang === "TE" ? "ఖర్చు మరియు ఆదాయ ధోరణులు" : "Expense vs Income Trends"}
+        </h3>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={activeAreaData}>
@@ -56,7 +61,7 @@ export default function DashboardCharts({ areaData, pieData }: ChartProps) {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
               <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
-              <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `$${value}`} />
+              <YAxis stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => `₹${value}`} />
               <Tooltip 
                 contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #334155", borderRadius: "12px" }}
                 itemStyle={{ fontSize: "12px" }}
@@ -70,7 +75,9 @@ export default function DashboardCharts({ areaData, pieData }: ChartProps) {
 
       {/* Category Breakdown */}
       <div className="p-6 rounded-3xl border border-white/5 glass-dark min-h-[400px]">
-        <h3 className="text-lg font-bold mb-6 text-white">Category Breakdown</h3>
+        <h3 className="text-lg font-bold mb-6 text-white">
+          {lang === "HI" ? "श्रेणी विवरण" : lang === "TE" ? "వర్గం వారీగా" : "Category Breakdown"}
+        </h3>
         <div className="h-[300px] w-full flex flex-col items-center justify-center">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>

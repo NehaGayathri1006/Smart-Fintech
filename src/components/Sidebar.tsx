@@ -17,19 +17,24 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const menuItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-  { icon: Receipt, label: "Transactions", href: "/transactions" },
-  { icon: ArrowRightLeft, label: "Converter", href: "/converter" },
-  { icon: Wallet, label: "Budgets", href: "/budgets" },
-  { icon: Target, label: "Savings", href: "/savings" },
-  { icon: PieChart, label: "Analysis", href: "/analysis" },
-  { icon: Users, label: "GuardianLink", href: "/guardian" },
-  { icon: TrendingUp, label: "Predictions", href: "/predictions" },
-];
+
+
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { lang, t } = useLanguage();
+
+  const menuItems = [
+    { icon: LayoutDashboard, label: t.dashboard, href: "/dashboard" },
+    { icon: Receipt, label: t.transactions, href: "/transactions" },
+    { icon: ArrowRightLeft, label: t.converter, href: "/converter" },
+    { icon: Wallet, label: t.budgets, href: "/budgets" },
+    { icon: Target, label: "Savings", href: "/savings" },
+    { icon: PieChart, label: "Analysis", href: "/analysis" },
+    { icon: Users, label: t.guardian, href: "/guardian" },
+    { icon: TrendingUp, label: "Predictions", href: "/predictions" },
+  ];
 
   return (
     <div className="w-64 h-screen glass-dark border-r border-border flex flex-col fixed left-0 top-0 z-40">
@@ -63,9 +68,11 @@ export default function Sidebar() {
       <div className="p-4 mt-auto">
         <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/20">
           <p className="text-xs text-emerald-400 font-semibold mb-1 uppercase tracking-wider">Pro Plan</p>
-          <p className="text-sm text-slate-300 mb-3">Get advanced spending predictions</p>
+          <p className="text-sm text-slate-300 mb-3">
+             {lang === "HI" ? "उन्नत भविष्यवाणियां प्राप्त करें" : lang === "TE" ? "అధునాతన అంచనాలను పొందండి" : "Get advanced spending predictions"}
+          </p>
           <button className="w-full py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-dark transition-colors">
-            Upgrade Now
+             {lang === "HI" ? "अभी अपग्रेड करें" : lang === "TE" ? "ఇప్పుడే అప్‌గ్రేడ్ చేయండి" : "Upgrade Now"}
           </button>
         </div>
       </div>

@@ -51,7 +51,7 @@ export async function POST(req: Request) {
       userAccount = await prisma.account.findFirst({ where: { userId: session.user.id } });
       if (!userAccount) {
          userAccount = await prisma.account.create({
-           data: { name: "Main Bank", balance: 0, currency: "USD", userId: session.user.id }
+           data: { name: "Main Bank", balance: 0, currency: "INR", userId: session.user.id }
          });
       }
     }
