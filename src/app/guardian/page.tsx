@@ -15,7 +15,8 @@ import {
   Loader2,
   Wallet,
   TrendingDown,
-  Clock
+  Clock,
+  User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
