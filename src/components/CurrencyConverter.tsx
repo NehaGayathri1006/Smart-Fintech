@@ -1,29 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   ArrowLeftRight, 
   RefreshCw, 
   ChevronDown, 
   TrendingUp, 
-  Globe 
+  Globe,
+  Loader2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const currencies = [
-  { code: "USD", name: "US Dollar", symbol: "$" },
-  { code: "EUR", name: "Euro", symbol: "€" },
-  { code: "GBP", name: "British Pound", symbol: "£" },
-  { code: "INR", name: "Indian Rupee", symbol: "₹" },
-  { code: "JPY", name: "Japanese Yen", symbol: "¥" },
-  { code: "AUD", name: "Australian Dollar", symbol: "A$" },
+  { code: "USD", name: "US Dollar" },
+  { code: "EUR", name: "Euro" },
+  { code: "GBP", name: "British Pound" },
+  { code: "INR", name: "Indian Rupee" },
+  { code: "JPY", name: "Japanese Yen" },
+  { code: "AUD", name: "Australian Dollar" },
+  { code: "CAD", name: "Canadian Dollar" },
+  { code: "SGD", name: "Singapore Dollar" },
+  { code: "CHF", name: "Swiss Franc" },
+  { code: "CNY", name: "Chinese Yuan" },
+  { code: "AED", name: "UAE Dirham" },
+  { code: "SAR", name: "Saudi Riyal" },
 ];
 
 export default function CurrencyConverter() {
   const [amount, setAmount] = useState("100");
   const [from, setFrom] = useState("USD");
-  const [to, setTo] = useState("EUR");
+  const [to, setTo] = useState("INR");
+  const [rate, setRate] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [isRotating, setIsRotating] = useState(false);
+  const [error, setError] = useState("");
+
+  const fetchRate = async () => {
+    setIsLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`https://api.exchangerate-api.com/v4/latest/${from}`);
+      const data = await res.json();
+      if (data.rates && data.rates[to]) {
+        setRate(data.rates[to]);
+      } else {
+        throw new Error("Rate not found");
+      }
+    } catch (err) {
+      console.error("Failed to fetch rates", err);
+      setError("Failed to fetch live rates. Using fallback.");
+      // Fallback rates if API fails
+      const fallbacks: any = { "USD": { "INR": 83.5, "EUR": 0.92, "GBP": 0.79 }, "INR": { "USD": 0.012, "EUR": 0.011 } };
+      setRate(fallbacks[from]?.[to] || 1);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRate();
+  }, [from, to]);
 
   const swapCurrencies = () => {
     setIsRotating(true);
@@ -32,6 +68,8 @@ export default function CurrencyConverter() {
     setTo(temp);
     setTimeout(() => setIsRotating(false), 500);
   };
+
+  const convertedAmount = rate ? (parseFloat(amount) * rate).toFixed(2) : "0.00";
 
   return (
     <div className="p-8 rounded-[40px] border border-white/5 glass-dark shadow-2xl space-y-8 animate-fade-in">
@@ -46,8 +84,8 @@ export default function CurrencyConverter() {
           </div>
         </div>
         <div className="px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
-          <RefreshCw className="w-3 h-3" />
-          <span>Updated Real-time</span>
+          <RefreshCw className={cn("w-3 h-3", isLoading && "animate-spin")} />
+          <span>{isLoading ? "Updating..." : "Updated Real-time"}</span>
         </div>
       </div>
 
@@ -68,14 +106,15 @@ export default function CurrencyConverter() {
         </div>
 
         <div className="flex flex-col md:flex-row items-center gap-4">
-          <div className="flex-1 w-full bg-slate-900 border border-white/5 rounded-[25px] p-4 flex items-center justify-between cursor-pointer hover:border-white/20 transition-all">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-bold text-white">
-                {from.slice(0, 2)}
-              </div>
-              <span className="text-sm font-bold text-white">{from}</span>
-            </div>
-            <ChevronDown className="w-4 h-4 text-slate-500" />
+          <div className="flex-1 w-full relative group">
+            <select 
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              className="w-full bg-slate-900 border border-white/5 rounded-[25px] p-4 text-white appearance-none focus:outline-none focus:border-primary/50 transition-all cursor-pointer font-bold text-sm"
+            >
+              {currencies.map(c => <option key={c.code} value={c.code}>{c.code} - {c.name}</option>)}
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
           </div>
 
           <button 
@@ -88,25 +127,33 @@ export default function CurrencyConverter() {
             <ArrowLeftRight className="w-5 h-5" />
           </button>
 
-          <div className="flex-1 w-full bg-slate-900 border border-white/5 rounded-[25px] p-4 flex items-center justify-between cursor-pointer hover:border-white/20 transition-all">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-[10px] font-bold text-white">
-                {to.slice(0, 2)}
-              </div>
-              <span className="text-sm font-bold text-white">{to}</span>
-            </div>
-            <ChevronDown className="w-4 h-4 text-slate-500" />
+          <div className="flex-1 w-full relative">
+            <select 
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              className="w-full bg-slate-900 border border-white/5 rounded-[25px] p-4 text-white appearance-none focus:outline-none focus:border-primary/50 transition-all cursor-pointer font-bold text-sm"
+            >
+              {currencies.map(c => <option key={c.code} value={c.code}>{c.code} - {c.name}</option>)}
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" />
           </div>
         </div>
 
         <div className="p-8 rounded-[35px] bg-primary/10 border border-primary/10 text-center space-y-2 relative overflow-hidden group">
           <p className="text-primary text-xs font-bold uppercase tracking-widest">Converted Amount</p>
-          <h4 className="text-5xl font-black text-white">
-            {to === "EUR" ? "€" : to === "INR" ? "₹" : "$"} {(parseFloat(amount) * 0.92).toFixed(2)}
-          </h4>
-          <p className="text-emerald-500/60 text-[10px] font-bold">1 {from} = 0.92 {to}</p>
+          <div className="flex items-center justify-center gap-2">
+            {isLoading ? (
+              <Loader2 className="w-10 h-10 text-primary animate-spin" />
+            ) : (
+              <h4 className="text-5xl font-black text-white">
+                {to === "INR" ? "₹" : to === "EUR" ? "€" : to === "GBP" ? "£" : ""}{convertedAmount}
+              </h4>
+            )}
+          </div>
+          <p className="text-emerald-500/60 text-[10px] font-bold">1 {from} = {rate ? rate.toFixed(4) : "..."} {to}</p>
           <TrendingUp className="absolute -right-4 -bottom-4 w-24 h-24 text-primary/5 group-hover:scale-110 transition-transform" />
         </div>
+        {error && <p className="text-center text-[10px] text-rose-500/70">{error}</p>}
       </div>
     </div>
   );

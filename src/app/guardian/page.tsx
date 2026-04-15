@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Users, 
   ShieldCheck, 
@@ -12,7 +12,10 @@ import {
   Copy,
   Check,
   AlertCircle,
-  Loader2
+  Loader2,
+  Wallet,
+  TrendingDown,
+  Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +26,24 @@ export default function GuardianPage() {
   const [guardianCode, setGuardianCode] = useState(""); 
   const [isLoading, setIsLoading] = useState(false);
   const [statusMsg, setStatusMsg] = useState({ text: "", isError: false });
+  const [children, setChildren] = useState<any[]>([]);
+
+  const fetchChildren = async () => {
+    try {
+      const res = await fetch("/api/guardian/children");
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setChildren(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch linked accounts", err);
+    }
+  };
+
+  useEffect(() => {
+    // Check if user is already a guardian with linked accounts
+    fetchChildren();
+  }, []);
 
   const handleSelectGuardian = async () => {
     setIsLoading(true);
@@ -66,7 +87,7 @@ export default function GuardianPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-12 animate-fade-in py-8">
+    <div className="max-w-6xl mx-auto space-y-12 animate-fade-in py-8 px-4">
       {/* Header */}
       <div className="text-center space-y-4">
         <div className="w-20 h-20 bg-primary/10 rounded-[30px] flex items-center justify-center mx-auto mb-6 border border-primary/20">
@@ -78,7 +99,7 @@ export default function GuardianPage() {
         </p>
       </div>
 
-      {!role ? (
+      {!role && children.length === 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Guardian Option */}
           <button 
@@ -119,56 +140,114 @@ export default function GuardianPage() {
             </div>
           </button>
         </div>
-      ) : role === "guardian" ? (
-        <div className="p-12 rounded-[60px] border border-white/5 glass-dark text-center space-y-8 max-w-2xl mx-auto">
-          <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-white">Your Sharing Code</h3>
-            <p className="text-slate-500 text-sm">Give this code to your child to start oversight.</p>
-          </div>
-          
-          <div className="flex items-center justify-center gap-4 bg-slate-950 p-6 rounded-[30px] border border-white/5 min-h-[100px]">
-            {isLoading ? (
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            ) : (
-              <>
-                <span className="text-4xl font-black text-primary tracking-widest">{guardianCode}</span>
+      ) : role === "guardian" || (children.length > 0 && !role) ? (
+        <div className="space-y-8">
+           {guardianCode && (
+              <div className="p-12 rounded-[60px] border border-white/5 glass-dark text-center space-y-8 max-w-2xl mx-auto mb-12">
+                <div className="space-y-4">
+                  <h3 className="text-2xl font-bold text-white">Your Sharing Code</h3>
+                  <p className="text-slate-500 text-sm">Give this code to your child to start oversight.</p>
+                </div>
+                
+                <div className="flex items-center justify-center gap-4 bg-slate-950 p-6 rounded-[30px] border border-white/5 min-h-[100px]">
+                  {isLoading ? (
+                    <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                  ) : (
+                    <>
+                      <span className="text-4xl font-black text-primary tracking-widest">{guardianCode}</span>
+                      <button 
+                        onClick={copyCode}
+                        className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all"
+                      >
+                        {isCopied ? <Check className="w-6 h-6 text-emerald-500" /> : <Copy className="w-6 h-6" />}
+                      </button>
+                    </>
+                  )}
+                </div>
                 <button 
-                  onClick={copyCode}
-                  className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition-all"
+                  onClick={() => setGuardianCode("")}
+                  className="text-slate-500 text-xs hover:text-white"
                 >
-                  {isCopied ? <Check className="w-6 h-6 text-emerald-500" /> : <Copy className="w-6 h-6" />}
+                  Hide Code
                 </button>
-              </>
-            )}
-          </div>
+              </div>
+           )}
 
-          <div className="p-6 rounded-3xl bg-primary/5 border border-primary/10 text-left space-y-4">
-            <div className="flex items-start gap-4">
-              <div className="p-2 rounded-lg bg-primary/20 text-primary">
-                <Eye className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white">Read-Only Access</p>
-                <p className="text-xs text-slate-500">You can see transactions but cannot move funds.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4">
-              <div className="p-2 rounded-lg bg-primary/20 text-primary">
-                <Lock className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white">Secure Sync</p>
-                <p className="text-xs text-slate-500">Linking is encrypted and can be revoked at any time.</p>
-              </div>
-            </div>
-          </div>
+           {children.length > 0 && (
+             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {children.map((child) => (
+                  <div key={child.id} className="p-8 rounded-[50px] border border-white/5 glass-dark space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                          <User className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-white">{child.name || child.email.split('@')[0]}</h3>
+                          <p className="text-xs text-slate-500">{child.email}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Total Balance</p>
+                        <p className="text-2xl font-black text-emerald-500">
+                          {child.accounts?.[0]?.currency || '$'} {child.accounts?.reduce((acc: number, curr: any) => acc + curr.balance, 0).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
 
-          <button 
-            onClick={() => { setRole(null); setGuardianCode(""); }}
-            className="text-slate-500 text-sm hover:text-white transition-colors"
-          >
-            Back to selection
-          </button>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 text-white/60 text-sm font-bold">
+                        <Clock className="w-4 h-4" />
+                        <span>Recent Transactions</span>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        {child.transactions?.length > 0 ? child.transactions.map((tx: any) => (
+                          <div key={tx.id} className="flex items-center justify-between p-4 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-slate-400">
+                                <Wallet className="w-5 h-5" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold text-white line-clamp-1">{tx.description}</p>
+                                <p className="text-[10px] text-slate-500">{tx.category?.name} • {new Date(tx.date).toLocaleDateString()}</p>
+                              </div>
+                            </div>
+                            <span className={cn(
+                              "text-sm font-bold",
+                              tx.type === "EXPENSE" ? "text-rose-500" : "text-emerald-500"
+                            )}>
+                              {tx.type === "EXPENSE" ? "-" : "+"} {tx.amount}
+                            </span>
+                          </div>
+                        )) : (
+                          <p className="text-center py-4 text-slate-600 text-sm italic">No recent activity</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <button className="w-full py-4 rounded-3xl bg-white/5 border border-white/5 text-slate-400 text-sm font-bold hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2">
+                       <Eye className="w-4 h-4" />
+                       View Full Analytics
+                    </button>
+                  </div>
+                ))}
+
+                {/* Card to add another child */}
+                <button 
+                  onClick={handleSelectGuardian}
+                  className="p-8 rounded-[50px] border border-dashed border-white/10 flex flex-col items-center justify-center gap-4 text-slate-500 hover:border-primary/50 hover:text-primary transition-all group"
+                >
+                  <div className="w-16 h-16 rounded-3xl bg-white/5 flex items-center justify-center group-hover:bg-primary/20 transition-all">
+                    <Users className="w-8 h-8" />
+                  </div>
+                  <div className="text-center">
+                    <p className="font-bold">Link Another Account</p>
+                    <p className="text-xs text-slate-600">Generate a new code for another student</p>
+                  </div>
+                </button>
+             </div>
+           )}
         </div>
       ) : (
         <div className="p-12 rounded-[60px] border border-white/5 glass-dark text-center space-y-8 max-w-2xl mx-auto">

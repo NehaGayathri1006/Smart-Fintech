@@ -110,10 +110,36 @@ export async function POST(req: Request) {
         });
 
         if (budget) {
-          await prismaTx.budget.update({
+          const updatedBudget = await prismaTx.budget.update({
             where: { id: budget.id },
             data: { spent: { increment: parsedAmount } }
           });
+
+          // Check for budget alerts
+          const percentSpent = (updatedBudget.spent / updatedBudget.limit) * 100;
+          
+          if (percentSpent >= 100) {
+            await prismaTx.notification.create({
+              data: {
+                userId: session.user.id,
+                message: `⚠️ Budget Exceeded! You have spent ${updatedBudget.spent} which is over your ${updatedBudget.limit} limit for ${category.name}.`,
+                type: "WARNING"
+              }
+            });
+          } else if (percentSpent >= 80) {
+            // Check if we already sent a warning for this budget recently? 
+            // For simplicity, we'll just send it if they are between 80-100% and it was just crossed
+            const oldPercent = (budget.spent / budget.limit) * 100;
+            if (oldPercent < 80) {
+              await prismaTx.notification.create({
+                data: {
+                  userId: session.user.id,
+                  message: `🔔 Budget Warning: You have reached ${Math.floor(percentSpent)}% of your ${category.name} budget.`,
+                  type: "INFO"
+                }
+              });
+            }
+          }
         }
       }
 
