@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import DashboardCards from "@/components/DashboardCards";
 import DashboardCharts from "@/components/DashboardCharts";
 import DashboardHeader from "@/components/DashboardHeader";
+import DashboardWidgets from "@/components/DashboardWidgets";
 import { Plus, Download, Filter, Calendar, CreditCard } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -40,7 +41,8 @@ export default async function DashboardPage() {
 
   // 3. Fetch Budgets
   const budgets = await prisma.budget.findMany({
-    where: { userId, month: now.getMonth() + 1, year: now.getFullYear() }
+    where: { userId, month: now.getMonth() + 1, year: now.getFullYear() },
+    include: { category: true }
   });
   const totalLimit = budgets.reduce((sum, b) => sum + b.limit, 0);
   const totalSpent = budgets.reduce((sum, b) => sum + b.spent, 0);
@@ -76,7 +78,7 @@ export default async function DashboardPage() {
   // 6. Chart Data (Pie Data: category breakdown of expenses)
   const categoryMap: Record<string, number> = {};
   monthTransactions.filter(t => t.type === "EXPENSE").forEach(t => {
-    const cName = t.category.name;
+    const cName = t.category?.name || "General";
     categoryMap[cName] = (categoryMap[cName] || 0) + t.amount;
   });
 
@@ -107,73 +109,8 @@ export default async function DashboardPage() {
       {/* Main Charts Section */}
       <DashboardCharts areaData={areaData} pieData={pieData} />
 
-      {/* Recent Activity / Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="p-6 rounded-3xl border border-white/5 glass-dark flex flex-col h-full">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-white">Recent Transactions</h3>
-            <button className="text-sm text-primary hover:underline">View All</button>
-          </div>
-          <div className="space-y-4 flex-1">
-            {recentActivity.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center py-10 px-4 rounded-2xl border border-white/5 bg-white/[0.02]">
-                <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mb-3">
-                  <CreditCard className="w-6 h-6 text-slate-500" />
-                </div>
-                <p className="text-slate-400 font-medium">No recent transactions</p>
-                <p className="text-xs text-slate-500 mt-1">Add your first transaction to see it here.</p>
-              </div>
-            ) : (
-              recentActivity.map(t => (
-                <div key={t.id} className="flex flex-row items-center justify-between py-3 px-4 rounded-xl border border-white/5 hover:bg-white/5 transition-colors">
-                  <div className="flex flex-row gap-3 items-center">
-                    <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center">
-                      <CreditCard className="w-5 h-5 text-slate-400" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-white">{t.description}</p>
-                      <p className="text-xs text-slate-400">{t.category?.name || "General"}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className={cn("text-sm font-bold", t.type === "EXPENSE" ? "text-rose-500" : "text-emerald-500")}>
-                      {t.type === "EXPENSE" ? "-" : "+"}${t.amount.toFixed(2)}
-                    </p>
-                    <p className="text-xs text-slate-500">{new Date(t.date).toLocaleDateString()}</p>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="p-6 rounded-3xl border border-white/5 glass-dark flex flex-col h-full">
-          <h3 className="text-lg font-bold mb-6 text-white">Budget Analysis</h3>
-          <div className="space-y-6 flex-1">
-            {budgets.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center py-8 px-4 rounded-2xl border border-white/5 bg-white/[0.02]">
-                <p className="text-slate-400 font-medium">No active budgets</p>
-                <p className="text-xs text-slate-500 mt-1">Create a budget to start tracking.</p>
-              </div>
-            ) : (
-              budgets.slice(0, 4).map(b => (
-                <div key={b.id} className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-slate-300 font-medium">Budget limits</span>
-                    <span className="text-white">${b.spent} <span className="text-slate-500">/ ${b.limit}</span></span>
-                  </div>
-                  <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                    <div 
-                      className={cn("h-full rounded-full transition-all", (b.spent / b.limit) > 0.9 ? "bg-rose-500" : "bg-primary")} 
-                      style={{ width: `${Math.min((b.spent / b.limit) * 100, 100)}%` }}
-                    />
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
+      {/* Recent Activity / Quick Actions (Localized) */}
+      <DashboardWidgets recentActivity={recentActivity} budgets={budgets} />
     </div>
   );
 }

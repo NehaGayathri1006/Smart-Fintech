@@ -22,6 +22,10 @@ export async function POST(req: Request) {
     // Call Gemini API
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json({ error: "API Key Missing" }, { status: 500 });
+    }
+    
     const prompt = `Analyze this receipt and extract the following information in JSON format: 
     { "amount": number, "description": "merchant name or short description", "category": "One of: Traveling, Transport, Medical, Food, Grocery, Insurance, Loans, EMI, Other" }
     Only return the JSON object, nothing else.`;

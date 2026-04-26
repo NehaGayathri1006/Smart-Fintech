@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
@@ -27,8 +27,8 @@ export async function GET() {
     const categoryMap: Record<string, { value: number, color: string }> = {};
     const colors = ["#10b981", "#3b82f6", "#8b5cf6", "#f59e0b", "#f43f5e", "#ec4899", "#8b5cf6"];
 
-    transactions.forEach((tx, i) => {
-      const name = tx.category.name;
+    transactions.forEach((tx) => {
+      const name = tx.category?.name || "General";
       if (!categoryMap[name]) {
         categoryMap[name] = { value: 0, color: colors[Object.keys(categoryMap).length % colors.length] };
       }
@@ -41,9 +41,12 @@ export async function GET() {
       color: data.color
     }));
 
-    // For the bar chart: last 6 months spend
-    const last6Months = [];
-    for (let i = 5; i >= 0; i--) {
+    const { searchParams } = new URL(req.url);
+    const monthsRange = parseInt(searchParams.get("months") || "6");
+
+    // For the bar chart: last X months spend based on monthsRange
+    const lastXMonths = [];
+    for (let i = monthsRange - 1; i >= 0; i--) {
         const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
         const nextD = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
         const monthName = d.toLocaleString('default', { month: 'short' });
@@ -57,7 +60,7 @@ export async function GET() {
             _sum: { amount: true }
         });
 
-        last6Months.push({
+        lastXMonths.push({
             month: monthName,
             amount: sum._sum.amount || 0
         });
@@ -65,7 +68,7 @@ export async function GET() {
 
     return NextResponse.json({
       categoryData,
-      monthlyTrends: last6Months,
+      monthlyTrends: lastXMonths,
       totalMonthlySpend: transactions.reduce((sum, t) => sum + t.amount, 0)
     });
   } catch (error) {

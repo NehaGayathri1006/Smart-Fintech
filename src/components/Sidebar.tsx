@@ -12,12 +12,13 @@ import {
   Bell,
   MessageCircle,
   ArrowRightLeft,
+  Send,
   Users,
-  PieChart
+  PieChart,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-
+import { signOut } from "next-auth/react";
 
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -30,10 +31,11 @@ export default function Sidebar() {
     { icon: Receipt, label: t.transactions, href: "/transactions" },
     { icon: ArrowRightLeft, label: t.converter, href: "/converter" },
     { icon: Wallet, label: t.budgets, href: "/budgets" },
-    { icon: Target, label: "Savings", href: "/savings" },
-    { icon: PieChart, label: "Analysis", href: "/analysis" },
+    { icon: Target, label: t.savings, href: "/savings" },
+    { icon: PieChart, label: t.analysis, href: "/analysis" },
+    { icon: Send, label: t.payments, href: "/payments" },
     { icon: Users, label: t.guardian, href: "/guardian" },
-    { icon: TrendingUp, label: "Predictions", href: "/predictions" },
+    { icon: TrendingUp, label: t.predictions, href: "/predictions" },
   ];
 
   return (
@@ -66,15 +68,13 @@ export default function Sidebar() {
       </nav>
 
       <div className="p-4 mt-auto">
-        <div className="p-4 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-transparent border border-emerald-500/20">
-          <p className="text-xs text-emerald-400 font-semibold mb-1 uppercase tracking-wider">Pro Plan</p>
-          <p className="text-sm text-slate-300 mb-3">
-             {lang === "HI" ? "उन्नत भविष्यवाणियां प्राप्त करें" : lang === "TE" ? "అధునాతన అంచనాలను పొందండి" : "Get advanced spending predictions"}
-          </p>
-          <button className="w-full py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-dark transition-colors">
-             {lang === "HI" ? "अभी अपग्रेड करें" : lang === "TE" ? "ఇప్పుడే అప్‌గ్రేడ్ చేయండి" : "Upgrade Now"}
-          </button>
-        </div>
+        <button 
+          onClick={() => signOut({ callbackUrl: "/login" })}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-rose-500 hover:bg-rose-500/10 transition-all duration-200 group border border-transparent hover:border-rose-500/20"
+        >
+          <LogOut className="w-5 h-5" />
+          <span className="font-bold">{t.logout}</span>
+        </button>
       </div>
     </div>
   );

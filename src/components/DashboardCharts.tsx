@@ -25,7 +25,7 @@ interface ChartProps {
 export default function DashboardCharts({ areaData, pieData }: ChartProps) {
   const { lang, t } = useLanguage();
   const defaultPieData = [
-    { name: lang === "HI" ? "पर्याप्त डेटा नहीं" : lang === "TE" ? "తగినంత డేటా లేదు" : "Not enough data", value: 100, color: "#334155" },
+    { name: t.notEnoughData, value: 100, color: "#334155" },
   ];
 
   const activePieData = pieData && pieData.length > 0 ? pieData : defaultPieData;
@@ -40,11 +40,11 @@ export default function DashboardCharts({ areaData, pieData }: ChartProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8 min-w-0">
       {/* Spending Trends */}
-      <div className="lg:col-span-2 p-6 rounded-3xl border border-white/5 glass-dark min-h-[400px]">
+      <div className="lg:col-span-2 p-6 rounded-3xl border border-white/5 glass-dark min-h-[400px] min-w-0">
         <h3 className="text-lg font-bold mb-6 text-white">
-          {lang === "HI" ? "व्यय बनाम आय रुझान" : lang === "TE" ? "ఖర్చు మరియు ఆదాయ ధోరణులు" : "Expense vs Income Trends"}
+          {t.expenseVsIncome}
         </h3>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -74,9 +74,9 @@ export default function DashboardCharts({ areaData, pieData }: ChartProps) {
       </div>
 
       {/* Category Breakdown */}
-      <div className="p-6 rounded-3xl border border-white/5 glass-dark min-h-[400px]">
+      <div className="p-6 rounded-3xl border border-white/5 glass-dark min-h-[400px] min-w-0">
         <h3 className="text-lg font-bold mb-6 text-white">
-          {lang === "HI" ? "श्रेणी विवरण" : lang === "TE" ? "వర్గం వారీగా" : "Category Breakdown"}
+          {t.categoryBreakdown}
         </h3>
         <div className="h-[300px] w-full flex flex-col items-center justify-center">
           <ResponsiveContainer width="100%" height="100%">

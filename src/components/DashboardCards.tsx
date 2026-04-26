@@ -1,3 +1,5 @@
+"use client";
+
 import { 
   ArrowUpRight, 
   ArrowDownRight, 
@@ -15,43 +17,46 @@ interface DashboardMetrics {
   budgetUsedPercent: number;
 }
 
+import { useLanguage } from "@/context/LanguageContext";
+
 export default function DashboardCards({ metrics }: { metrics: DashboardMetrics }) {
+  const { t } = useLanguage();
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
   };
 
   const stats = [
     { 
-      label: "True Net Worth", 
+      label: t.trueNetWorth, 
       value: formatCurrency(metrics.netWorth || 0), 
-      change: "Assets - Debts", 
+      change: t.assetsDebts, 
       isPositive: metrics.netWorth >= 0, 
       icon: Wallet,
       color: "from-emerald-500/20 to-emerald-500/5",
       iconColor: "text-emerald-500"
     },
     { 
-      label: "Monthly Expenses", 
+      label: t.monthlyExpensesLabel, 
       value: formatCurrency(metrics.monthlyExpenses || 0), 
-      change: "This month", 
+      change: t.thisMonth, 
       isPositive: false, 
       icon: ArrowDownRight,
       color: "from-rose-500/20 to-rose-500/5",
       iconColor: "text-rose-500"
     },
     { 
-      label: "Total Savings", 
+      label: t.totalSavings, 
       value: formatCurrency(metrics.totalSavings || 0), 
-      change: "Active Goals", 
+      change: t.activeGoals, 
       isPositive: true, 
       icon: TrendingUp,
       color: "from-blue-500/20 to-blue-500/5",
       iconColor: "text-blue-500"
     },
     { 
-      label: "Budget Used", 
+      label: t.budgetUsed, 
       value: `${metrics.budgetUsedPercent || 0}%`, 
-      change: metrics.budgetUsedPercent > 100 ? "Over budget" : "On track", 
+      change: metrics.budgetUsedPercent > 100 ? t.overBudget : t.onTrack, 
       isPositive: metrics.budgetUsedPercent <= 100, 
       icon: PieChartIcon,
       color: metrics.budgetUsedPercent > 100 ? "from-rose-500/20 to-rose-500/5" : "from-amber-500/20 to-amber-500/5",

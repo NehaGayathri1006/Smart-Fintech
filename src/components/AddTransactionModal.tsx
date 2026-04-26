@@ -14,9 +14,11 @@ interface Props {
 
 
 import { useLanguage } from "@/context/LanguageContext";
+import { useRouter } from "next/navigation";
 
 export default function AddTransactionModal({ isOpen, onClose }: Props) {
   const { lang, t } = useLanguage();
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [isAIProcessing, setIsAIProcessing] = useState(false);
   const [accounts, setAccounts] = useState<any[]>([]);
@@ -288,8 +290,7 @@ export default function AddTransactionModal({ isOpen, onClose }: Props) {
                           });
                           if (!res.ok) throw new Error("Failed to save transaction");
                           onClose();
-                          // In a full app, we'd invalidate the cache or refresh page here
-                          window.location.reload();
+                          router.refresh();
                         } catch (e) {
                           alert("Failed to save transaction. Please check your data.");
                         }

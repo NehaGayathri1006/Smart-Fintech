@@ -14,7 +14,10 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { useLanguage } from "@/context/LanguageContext";
+
 export default function PredictionsPage() {
+  const { t } = useLanguage();
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -28,8 +31,8 @@ export default function PredictionsPage() {
       .catch(() => setIsLoading(false));
   }, []);
 
-  if (isLoading) return <div className="h-[60vh] flex items-center justify-center text-slate-500">Neural Engine calculating...</div>;
-  if (!data) return <div className="h-[60vh] flex items-center justify-center text-slate-500">Insufficient data for prediction.</div>;
+  if (isLoading) return <div className="h-[60vh] flex items-center justify-center text-slate-500">{t.loadingAnalysis}</div>;
+  if (!data) return <div className="h-[60vh] flex items-center justify-center text-slate-500">{t.noAnalysisData}</div>;
 
   const insights = data.insights.map((ins: any) => ({
     title: ins.title,
@@ -50,18 +53,18 @@ export default function PredictionsPage() {
           <div className="space-y-6">
             <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full w-fit">
               <BrainCircuit className="w-4 h-4 text-primary" />
-              <span className="text-xs font-black text-primary uppercase tracking-[0.2em]">Neural Engine Active</span>
+              <span className="text-xs font-black text-primary uppercase tracking-[0.2em]">{t.neuralEngineActive}</span>
             </div>
             <h1 className="text-5xl font-black text-white leading-tight">
-              AI Spending <br />
-              <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">Predictions</span>
+              {t.aiSpendingPredictions.split(' ').slice(0, 2).join(' ')} <br />
+              <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent">{t.aiSpendingPredictions.split(' ').slice(2).join(' ')}</span>
             </h1>
             <p className="text-slate-400 text-lg leading-relaxed">
-              Our advanced AI models analyze thousands of data points from your transaction history to forecast future spending and identify saving opportunities.
+              {t.inDepthBreakdown}
             </p>
             <div className="flex items-center gap-4">
               <button className="px-8 py-4 bg-primary text-white font-bold rounded-2xl hover:scale-105 transition-all shadow-xl shadow-primary/20 flex items-center gap-2">
-                Generate Full Report
+                {t.generateFullReport}
                 <ArrowRight className="w-5 h-5" />
               </button>
               <div className="flex -space-x-3">
@@ -77,14 +80,14 @@ export default function PredictionsPage() {
           <div className="p-8 rounded-[40px] bg-slate-950/50 border border-white/10 backdrop-blur-3xl">
             <div className="space-y-8">
               <div className="flex items-center justify-between">
-                <h3 className="text-white font-bold">Projected Net Monthly Balance</h3>
+                <h3 className="text-white font-bold">{t.projectedNetMonthly}</h3>
                 <Calendar className="w-5 h-5 text-slate-500" />
               </div>
               <div className="space-y-4">
                 <div className="flex items-end justify-between">
-                  <span className="text-4xl font-black text-white">${data.projectedSpend.toLocaleString()}</span>
+                  <span className="text-4xl font-black text-white">₹{data.projectedSpend.toLocaleString()}</span>
                   <span className={cn("font-bold mb-1", parseFloat(data.trendPercent) > 0 ? "text-rose-500" : "text-emerald-500")}>
-                    {parseFloat(data.trendPercent) > 0 ? "+" : ""}{data.trendPercent}% vs Last Month
+                    {parseFloat(data.trendPercent) > 0 ? "+" : ""}{data.trendPercent}% {t.vsLastMonth}
                   </span>
                 </div>
                 <div className="h-4 w-full bg-slate-900 rounded-full overflow-hidden flex">
@@ -92,8 +95,8 @@ export default function PredictionsPage() {
                   <div className="h-full bg-slate-800 w-[30%]" />
                 </div>
                 <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                  <span>Current Spending</span>
-                  <span>Safety Margin</span>
+                  <span>{t.currentSpending}</span>
+                  <span>{t.safetyMargin}</span>
                 </div>
               </div>
             </div>
@@ -112,7 +115,7 @@ export default function PredictionsPage() {
               {insight.desc}
             </p>
             <button className={cn("text-sm font-bold flex items-center gap-2 transition-all group-hover:gap-3", insight.color)}>
-              Take Action <ArrowRight className="w-4 h-4" />
+              {t.takeAction} <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         ))}
@@ -124,30 +127,30 @@ export default function PredictionsPage() {
           <div className="absolute inset-0 rounded-full border-[10px] border-primary border-t-transparent -rotate-45" />
           <div className="text-center">
             <p className="text-4xl font-black text-white">{data.safetyScore}</p>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Safety Score</p>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{t.safetyScore}</p>
           </div>
         </div>
         <div className="flex-1 space-y-4">
           <div className="flex items-center gap-2 text-primary font-bold">
             <ShieldCheck className="w-5 h-5" />
-            <span>Excellent Security & Savings Habits</span>
+            <span>{t.excellentSecurity}</span>
           </div>
           <p className="text-slate-400 text-sm leading-relaxed max-w-xl">
-            Your safety score is calculated based on your budget adherence, emergency fund status, and debt-to-income ratio. You're in the top 5% of users with similar income levels.
+            {t.safetyScoreDesc}
           </p>
           <div className="flex gap-4">
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <AlertCircle className="w-3 h-3" />
-              Debt Ratio: 12%
+              {t.debtRatio} 12%
             </div>
             <div className="flex items-center gap-1.5 text-xs text-slate-500">
               <AlertCircle className="w-3 h-3" />
-              Emergency Fund: 6 Months
+              {t.emergencyFund} 6 {t.monthsNum}
             </div>
           </div>
         </div>
         <button className="px-8 py-4 bg-white/5 border border-white/10 text-white font-bold rounded-2xl hover:bg-white/10 transition-all text-sm shrink-0">
-          View Detailed Audit
+          {t.viewDetailedAudit}
         </button>
       </div>
     </div>

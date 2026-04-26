@@ -19,8 +19,10 @@ import {
   User
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function GuardianPage() {
+  const { t } = useLanguage();
   const [role, setRole] = useState<"guardian" | "child" | null>(null);
   const [code, setCode] = useState("");
   const [isCopied, setIsCopied] = useState(false);
@@ -94,9 +96,9 @@ export default function GuardianPage() {
         <div className="w-20 h-20 bg-primary/10 rounded-[30px] flex items-center justify-center mx-auto mb-6 border border-primary/20">
           <ShieldCheck className="w-10 h-10 text-primary" />
         </div>
-        <h1 className="text-4xl font-black text-white px-2">GuardianLink Oversight</h1>
+        <h1 className="text-4xl font-black text-white px-2">{t.guardianLinkOversight}</h1>
         <p className="text-slate-400 max-w-lg mx-auto leading-relaxed">
-          Securely link accounts to provide financial oversight for children while maintaining their privacy and independence.
+          {t.guardianDesc}
         </p>
       </div>
 
@@ -112,9 +114,9 @@ export default function GuardianPage() {
               <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
                 <Users className="w-7 h-7" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">I'm a Guardian</h3>
+              <h3 className="text-2xl font-bold text-white mb-2">{t.imAGuardian}</h3>
               <p className="text-slate-500 text-sm leading-relaxed">
-                Generate a secure code to link your child's account and monitor their spending habits.
+                {t.imAGuardianDesc}
               </p>
             </div>
             <div className="absolute right-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all">
@@ -131,9 +133,9 @@ export default function GuardianPage() {
               <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center text-emerald-500 mb-6 group-hover:bg-emerald-500 group-hover:text-white transition-all">
                 <Smartphone className="w-7 h-7" />
               </div>
-              <h3 className="text-2xl font-bold text-white mb-2">I'm a Student</h3>
+              <h3 className="text-2xl font-bold text-white mb-2">{t.imAStudent}</h3>
               <p className="text-slate-500 text-sm leading-relaxed">
-                Enter the code provided by your guardian to grant them read-only oversight access.
+                {t.imAStudentDesc}
               </p>
             </div>
             <div className="absolute right-8 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all">
@@ -146,8 +148,8 @@ export default function GuardianPage() {
           {guardianCode && (
             <div className="p-12 rounded-[60px] border border-white/5 glass-dark text-center space-y-8 max-w-2xl mx-auto mb-12">
               <div className="space-y-4">
-                <h3 className="text-2xl font-bold text-white">Your Sharing Code</h3>
-                <p className="text-slate-500 text-sm">Give this code to your child to start oversight.</p>
+                <h3 className="text-2xl font-bold text-white">{t.yourSharingCode}</h3>
+                <p className="text-slate-500 text-sm">{t.giveThisCode}</p>
               </div>
 
               <div className="flex items-center justify-center gap-4 bg-slate-950 p-6 rounded-[30px] border border-white/5 min-h-[100px]">
@@ -169,7 +171,7 @@ export default function GuardianPage() {
                 onClick={() => setGuardianCode("")}
                 className="text-slate-500 text-xs hover:text-white"
               >
-                Hide Code
+                {t.hideCode}
               </button>
             </div>
           )}
@@ -189,7 +191,7 @@ export default function GuardianPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Total Balance</p>
+                      <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{t.totalBalance}</p>
                       <p className="text-2xl font-black text-emerald-500">
                         {child.accounts?.[0]?.currency === 'INR' ? '₹' : (child.accounts?.[0]?.currency || '₹')} {child.accounts?.reduce((acc: number, curr: any) => acc + curr.balance, 0).toLocaleString()}
                       </p>
@@ -199,7 +201,7 @@ export default function GuardianPage() {
                   <div className="space-y-4">
                     <div className="flex items-center gap-2 text-white/60 text-sm font-bold">
                       <Clock className="w-4 h-4" />
-                      <span>Recent Transactions</span>
+                      <span>{t.recentTransactions}</span>
                     </div>
 
                     <div className="space-y-3">
@@ -222,14 +224,14 @@ export default function GuardianPage() {
                           </span>
                         </div>
                       )) : (
-                        <p className="text-center py-4 text-slate-600 text-sm italic">No recent activity</p>
+                        <p className="text-center py-4 text-slate-600 text-sm italic">{t.noRecentActivity}</p>
                       )}
                     </div>
                   </div>
 
                   <button className="w-full py-4 rounded-3xl bg-white/5 border border-white/5 text-slate-400 text-sm font-bold hover:bg-white/10 hover:text-white transition-all flex items-center justify-center gap-2">
                     <Eye className="w-4 h-4" />
-                    View Full Analytics
+                    {t.viewFullAnalytics}
                   </button>
                 </div>
               ))}
@@ -243,8 +245,8 @@ export default function GuardianPage() {
                   <Users className="w-8 h-8" />
                 </div>
                 <div className="text-center">
-                  <p className="font-bold">Link Another Account</p>
-                  <p className="text-xs text-slate-600">Generate a new code for another student</p>
+                  <p className="font-bold">{t.linkAnotherAccount}</p>
+                  <p className="text-xs text-slate-600">{t.generateNewCode}</p>
                 </div>
               </button>
             </div>
@@ -253,8 +255,8 @@ export default function GuardianPage() {
       ) : (
         <div className="p-12 rounded-[60px] border border-white/5 glass-dark text-center space-y-8 max-w-2xl mx-auto">
           <div className="space-y-4">
-            <h3 className="text-2xl font-bold text-white">Enter Link Code</h3>
-            <p className="text-slate-500 text-sm">Enter the code provided by your parent or guardian.</p>
+            <h3 className="text-2xl font-bold text-white">{t.enterLinkCode}</h3>
+            <p className="text-slate-500 text-sm">{t.enterCodeProvided}</p>
           </div>
 
           <div className="relative">
@@ -271,7 +273,7 @@ export default function GuardianPage() {
           <div className="flex items-start gap-3 text-left p-4 rounded-2xl bg-amber-500/5 border border-amber-500/20">
             <AlertCircle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
             <p className="text-xs text-slate-400">
-              By entering this code, you are granting read-only access to your transactions and budget history to the guardian associated with this code.
+              {t.byEnteringThisCode}
             </p>
           </div>
 
@@ -287,14 +289,14 @@ export default function GuardianPage() {
             className="w-full py-6 bg-emerald-500 text-white font-black rounded-[30px] hover:bg-emerald-600 transition-all shadow-xl shadow-emerald-500/20 flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {isLoading && <Loader2 className="w-5 h-5 animate-spin" />}
-            <span>Link Account</span>
+            <span>{t.linkAccount}</span>
           </button>
 
           <button
             onClick={() => { setRole(null); setCode(""); setStatusMsg({ text: "", isError: false }); }}
             className="text-slate-500 text-sm hover:text-white transition-colors"
           >
-            Back to selection
+            {t.backToSelection}
           </button>
         </div>
       )}

@@ -5,7 +5,10 @@ import { Plus, Target, TrendingUp, Calendar, CreditCard, ChevronRight, Sparkles,
 import { cn } from "@/lib/utils";
 import AddGoalModal from "@/components/AddGoalModal";
 
+import { useLanguage } from "@/context/LanguageContext";
+
 export default function SavingsPage() {
+  const { t } = useLanguage();
   const [goals, setGoals] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -25,8 +28,8 @@ export default function SavingsPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Savings Goals</h1>
-          <p className="text-slate-400 mt-1">Plan and track your long-term financial goals.</p>
+          <h1 className="text-3xl font-bold text-white">{t.savings}</h1>
+          <p className="text-slate-400 mt-1">{t.inDepthBreakdown}</p>
         </div>
         
         <button 
@@ -42,8 +45,8 @@ export default function SavingsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="p-8 rounded-[40px] border border-white/5 bg-gradient-to-br from-primary/20 to-transparent glass-dark relative overflow-hidden">
           <div className="relative z-10">
-            <h3 className="text-lg font-bold text-white mb-2">Total Savings</h3>
-            <p className="text-4xl font-black text-white">${totalSaved.toLocaleString()}</p>
+            <h3 className="text-lg font-bold text-white mb-2">{t.totalSavings}</h3>
+            <p className="text-4xl font-black text-white">₹{totalSaved.toLocaleString()}</p>
             <div className="flex items-center gap-2 mt-4 text-emerald-400 font-bold bg-emerald-500/10 w-fit px-3 py-1 rounded-full text-xs">
               <TrendingUp className="w-4 h-4" />
               <span>+12% this year</span>
@@ -53,14 +56,14 @@ export default function SavingsPage() {
         </div>
 
         <div className="p-8 rounded-[40px] border border-white/5 bg-gradient-to-br from-violet-500/20 to-transparent glass-dark">
-          <h3 className="text-lg font-bold text-white mb-4">Monthly Allocation</h3>
+          <h3 className="text-lg font-bold text-white mb-4">{t.budgetAnalysis}</h3>
           <div className="space-y-4">
             <div className="flex justify-between items-center px-4 py-3 rounded-2xl bg-white/5 border border-white/5">
-              <span className="text-slate-400 text-sm">Target Saving</span>
-              <span className="text-white font-bold">$1,500.00</span>
+              <span className="text-slate-400 text-sm">{t.targetSaving}</span>
+              <span className="text-white font-bold">₹1,500.00</span>
             </div>
             <div className="flex justify-between items-center px-4 py-3 rounded-2xl bg-white/5 border border-white/5">
-              <span className="text-slate-400 text-sm">Auto-Draft</span>
+              <span className="text-slate-400 text-sm">{t.autoDraft}</span>
               <span className="text-emerald-500 font-bold">Enabled</span>
             </div>
           </div>
@@ -70,7 +73,9 @@ export default function SavingsPage() {
       {/* Goals List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {goals.map((goal, i) => {
-          const progress = (goal.current / goal.target) * 100;
+          const current = goal.currentAmount || 0;
+          const target = goal.targetAmount || 1;
+          const progress = (current / target) * 100;
 
           return (
             <div key={i} className="p-8 rounded-[40px] border border-white/5 glass-dark group hover:border-white/10 transition-all relative overflow-hidden">
@@ -82,7 +87,7 @@ export default function SavingsPage() {
                   <div>
                     <h3 className="text-xl font-bold text-white">{goal.name}</h3>
                     <p className="text-sm text-slate-500 flex items-center gap-2">
-                       <Calendar className="w-3 h-3" /> Target: {goal.deadline}
+                       <Calendar className="w-3 h-3" /> Target: {goal.deadline ? new Date(goal.deadline).toLocaleDateString() : 'N/A'}
                     </p>
                   </div>
                 </div>
@@ -95,11 +100,11 @@ export default function SavingsPage() {
                 <div className="flex justify-between text-sm">
                   <div className="space-y-1">
                     <p className="text-slate-400 font-medium">Saved</p>
-                    <p className="text-2xl font-black text-white">${goal.current.toLocaleString()}</p>
+                    <p className="text-2xl font-black text-white">₹{current.toLocaleString()}</p>
                   </div>
                   <div className="space-y-1 text-right">
                     <p className="text-slate-400 font-medium">Target</p>
-                    <p className="text-2xl font-black text-slate-700">${goal.target.toLocaleString()}</p>
+                    <p className="text-2xl font-black text-slate-700">₹{target.toLocaleString()}</p>
                   </div>
                 </div>
 

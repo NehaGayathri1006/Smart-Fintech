@@ -17,7 +17,10 @@ import { cn } from "@/lib/utils";
 import AddTransactionModal from "@/components/AddTransactionModal";
 import { useEffect } from "react";
 
+import { useLanguage } from "@/context/LanguageContext";
+
 export default function TransactionsPage() {
+  const { t } = useLanguage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [transactions, setTransactions] = useState<any[]>([]);
@@ -41,8 +44,8 @@ export default function TransactionsPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Transactions</h1>
-          <p className="text-slate-400 mt-1">Manage and track all your financial activities.</p>
+          <h1 className="text-3xl font-bold text-white">{t.transactions}</h1>
+          <p className="text-slate-400 mt-1">{t.inDepthBreakdown}</p>
         </div>
         
         <div className="flex items-center gap-3">
@@ -51,7 +54,7 @@ export default function TransactionsPage() {
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white hover:bg-primary-dark transition-all hover:scale-105 shadow-lg shadow-primary/20"
           >
             <Plus className="w-4 h-4" />
-            <span className="text-sm font-medium">New Transaction</span>
+            <span className="text-sm font-medium">{t.newTransaction}</span>
           </button>
         </div>
       </div>
@@ -62,7 +65,7 @@ export default function TransactionsPage() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
           <input 
             type="text"
-            placeholder="Search transactions..."
+            placeholder={t.searchTransactionsPlaceholder}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full bg-slate-900/50 border border-white/5 rounded-2xl py-3 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 transition-colors"
@@ -71,11 +74,11 @@ export default function TransactionsPage() {
         <div className="flex gap-2">
           <button className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-slate-900 border border-white/5 text-slate-400 hover:text-white transition-colors">
             <Filter className="w-4 h-4" />
-            <span className="text-sm font-medium">Filter</span>
+            <span className="text-sm font-medium">{t.filter}</span>
           </button>
           <button className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-slate-900 border border-white/5 text-slate-400 hover:text-white transition-colors">
             <Calendar className="w-4 h-4" />
-            <span className="text-sm font-medium">Date Range</span>
+            <span className="text-sm font-medium">{t.dateRange}</span>
           </button>
         </div>
       </div>
@@ -96,11 +99,11 @@ export default function TransactionsPage() {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-white/5 bg-white/5">
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Transaction</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Category</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Amount</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">{t.transaction}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">{t.category}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">{t.date}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">{t.status}</th>
+                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">{t.amount}</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider"></th>
               </tr>
             </thead>
@@ -117,7 +120,7 @@ export default function TransactionsPage() {
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-xs font-medium px-2 py-1 rounded-lg bg-slate-800 text-slate-400 border border-white/5">
-                      {tx.category?.name || tx.category || "Unknown"}
+                      {tx.category?.name || tx.category || t.unknown}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-400">
@@ -133,7 +136,7 @@ export default function TransactionsPage() {
                     "px-6 py-4 text-sm font-bold text-right",
                     tx.type === "EXPENSE" ? "text-rose-400" : "text-emerald-400"
                   )}>
-                    {tx.type === "EXPENSE" ? "-" : "+"}${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                    {tx.type === "EXPENSE" ? "-" : "+"}₹{tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button className="p-2 rounded-lg hover:bg-white/5 text-slate-500 hover:text-white transition-colors">

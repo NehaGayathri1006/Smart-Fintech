@@ -24,6 +24,7 @@ export default function TopNav() {
         setUnreadCount(data.filter(n => !n.isRead).length);
       }
     } catch (err) {
+      if (err instanceof TypeError && err.message === "Failed to fetch") return;
       console.error("Failed to fetch notifications", err);
     }
   };

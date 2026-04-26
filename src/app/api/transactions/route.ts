@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     // Map the user's specific categories correctly using title case to match standard
     const catName = validatedData.categoryName;
     const isSavings = catName.toLowerCase().includes("saving") || catName.toLowerCase().includes("investment");
-    const txType = validatedData.type || (isSavings ? "EXPENSE" : "EXPENSE"); // Default to expense unless explicitly INCOME
+    const txType = validatedData.type || "EXPENSE"; // Default to expense unless explicitly INCOME
 
     // Find category by name
     let category = await prisma.category.findFirst({
@@ -61,6 +61,8 @@ export async function POST(req: Request) {
     if (isNaN(parsedAmount)) {
       return NextResponse.json({ error: "Invalid amount provided" }, { status: 400 });
     }
+
+    // Balance validation removed to allow tracking expenses with a negative balance
 
     // START PRISMA TRANSACTION FOR DATA CONSISTENCY
     const result = await prisma.$transaction(async (prismaTx) => {
@@ -172,9 +174,9 @@ export async function POST(req: Request) {
     });
 
     return new Response(JSON.stringify(result), { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: (error as any).errors }, { status: 400 });
+      return NextResponse.json({ error: error.issues }, { status: 400 });
     }
     console.error("Transaction Error:", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

@@ -17,17 +17,28 @@ export default function AIAssistant() {
 
     const userMessage = { role: "user", content: message };
     setMessages(prev => [...prev, userMessage]);
+    const currentMessage = message;
     setMessage("");
     setIsLoading(true);
 
-    // Mock AI response for now - later connect to Gemini API
-    setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: "assistant", 
-        content: "I'm analyzing your spending patterns. Based on your current data, you've spent 15% more on Food this month compared to last month. Consider setting a budget alert." 
-      }]);
+    try {
+      const res = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: currentMessage })
+      });
+      const data = await res.json();
+      
+      if (res.ok) {
+        setMessages(prev => [...prev, { role: "assistant", content: data.response || data.error }]);
+      } else {
+        setMessages(prev => [...prev, { role: "assistant", content: "Sorry, I encountered an error analyzing your data." }]);
+      }
+    } catch (err) {
+       setMessages(prev => [...prev, { role: "assistant", content: "Connection error." }]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   return (

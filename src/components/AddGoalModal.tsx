@@ -9,7 +9,10 @@ interface Props {
   onClose: () => void;
 }
 
+import { useRouter } from "next/navigation";
+
 export default function AddGoalModal({ isOpen, onClose }: Props) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -37,7 +40,7 @@ export default function AddGoalModal({ isOpen, onClose }: Props) {
       if (!res.ok) throw new Error("Failed to create goal");
       
       onClose();
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       alert("Error creating goal");
     } finally {

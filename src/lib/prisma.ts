@@ -4,7 +4,12 @@ import { PrismaPg } from "@prisma/adapter-pg";
 
 const prismaClientSingleton = () => {
   const connectionString = process.env.DATABASE_URL || "postgresql://neondb_owner:npg_x34BYUVSWMRz@ep-flat-snow-a4j15zjs.us-east-1.aws.neon.tech/neondb?sslmode=require";
-  const pool = new Pool({ connectionString });
+  const pool = new Pool({ 
+    connectionString,
+    ssl: {
+      rejectUnauthorized: false
+    }
+  });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
 };

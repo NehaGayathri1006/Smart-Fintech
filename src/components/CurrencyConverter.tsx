@@ -26,7 +26,10 @@ const currencies = [
   { code: "SAR", name: "Saudi Riyal" },
 ];
 
+import { useLanguage } from "@/context/LanguageContext";
+
 export default function CurrencyConverter() {
+  const { t } = useLanguage();
   const [amount, setAmount] = useState("100");
   const [from, setFrom] = useState("USD");
   const [to, setTo] = useState("INR");
@@ -79,19 +82,19 @@ export default function CurrencyConverter() {
             <Globe className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-xl font-bold text-white">Currency Converter</h3>
-            <p className="text-xs text-slate-500 font-medium">Live Market Exchange Rates</p>
+            <h3 className="text-xl font-bold text-white">{t.converterHeader}</h3>
+            <p className="text-xs text-slate-500 font-medium">{t.liveMarketRates}</p>
           </div>
         </div>
         <div className="px-3 py-1 bg-emerald-500/10 text-emerald-500 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
           <RefreshCw className={cn("w-3 h-3", isLoading && "animate-spin")} />
-          <span>{isLoading ? "Updating..." : "Updated Real-time"}</span>
+          <span>{isLoading ? t.updating : t.updatedRealtime}</span>
         </div>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-2">
-          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-4">Amount</label>
+          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest ml-4">{t.amount}</label>
           <div className="relative">
             <input 
               type="number"
@@ -140,7 +143,7 @@ export default function CurrencyConverter() {
         </div>
 
         <div className="p-8 rounded-[35px] bg-primary/10 border border-primary/10 text-center space-y-2 relative overflow-hidden group">
-          <p className="text-primary text-xs font-bold uppercase tracking-widest">Converted Amount</p>
+          <p className="text-primary text-xs font-bold uppercase tracking-widest">{t.convertedAmountLabel}</p>
           <div className="flex items-center justify-center gap-2">
             {isLoading ? (
               <Loader2 className="w-10 h-10 text-primary animate-spin" />

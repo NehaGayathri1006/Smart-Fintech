@@ -101,7 +101,7 @@ export default function BankDetailsPage() {
 
                 <div className="pt-6 border-t border-white/10">
                   <p className="text-white/40 text-xs font-bold uppercase mb-1">Available Balance</p>
-                  <p className="text-3xl font-black text-white">${acc.balance.toLocaleString()}</p>
+                  <p className="text-3xl font-black text-white">₹{acc.balance.toLocaleString()}</p>
                 </div>
               </div>
             </div>

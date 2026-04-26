@@ -47,7 +47,7 @@ export async function GET() {
     const insights = [
       {
         title: "Monthly Forecast",
-        description: `Based on your last 3 months, we project a spend of $${projectedSpend.toLocaleString()} for ${now.toLocaleString('default', { month: 'long' })}.`,
+        description: `Based on your last 3 months, we project a spend of ₹${projectedSpend.toLocaleString()} for ${now.toLocaleString('default', { month: 'long' })}.`,
         type: "info"
       },
       {
